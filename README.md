@@ -1,2 +1,2 @@
 # deaf-mapper
-Integrate most mapper framework with spring boot projects
+Integrate most mapper frameworks with spring boot projects
