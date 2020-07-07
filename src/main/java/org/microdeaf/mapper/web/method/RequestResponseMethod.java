@@ -1,76 +1,107 @@
+/*
+ * Copyright 2013-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.microdeaf.mapper.web.method;
 
-import org.springframework.core.MethodParameter;
-import org.springframework.core.env.Environment;
+import org.microdeaf.mapper.annotation.MicrodeafMapper;
+import org.microdeaf.mapper.enums.ClassType;
+import org.microdeaf.mapper.mapstruct.BaseMapper;
+import org.reflections.Reflections;
 
-import java.util.List;
+import java.util.Set;
 
+/**
+ * @author Mohammad Khosrojerdi     m.khosrojerdi.d@gmail.com
+ *  @since 2020-07-06
+ */
 public class RequestResponseMethod {
-    private static RequestResponseMethod ourInstance = new RequestResponseMethod();
+    private static RequestResponseMethod ourInstance;
+    private static Set<Class<?>> classes;
 
+    /**
+     * This is static method that return an object from this class.
+     * If an object is not created, an object is created
+     * from this class and then  return the created object.
+     *
+     * @return an object from this class.
+     */
     public static RequestResponseMethod getInstance() {
+        if (ourInstance == null) {
+            ourInstance = new RequestResponseMethod();
+            return ourInstance;
+        }
+        return ourInstance;
+    }
+
+    /**
+     * This is static method that return an object from this class.
+     * If an object is not created, an object is created
+     * from the class, and then it finds the classes that
+     * have the {@link MicrodeafMapper} annotation and
+     * finally return the created object.
+     *
+     * @return an object from this class.
+     */
+    public static RequestResponseMethod getInstance(String basePackage) {
+        if (ourInstance == null) {
+            ourInstance = new RequestResponseMethod();
+            Reflections ref = new Reflections(basePackage);
+            classes = ref.getTypesAnnotatedWith(MicrodeafMapper.class);
+            return ourInstance;
+        }
         return ourInstance;
     }
 
     private RequestResponseMethod() {
     }
 
-    public Class<?> getViewClass(Object o, Environment env) {
-        if (o != null) {
-            Class<?> viewClass = null;
-            if (o.getClass().getSimpleName().equals("ArrayList")) {
-                List list = (List) o;
-                viewClass = getView(list.get(0).getClass().getSimpleName(), env.getProperty("microdeaf.mapper.mapstruct.view.path"));
-            } else {
-                viewClass = getView(o.getClass().getSimpleName(), env.getProperty("microdeaf.mapper.mapstruct.view.path"));
-            }
-            if (viewClass != null) {
-                return viewClass;
-            }
-        }
-
-        return null;
-
-    }
-
-    public Class<?> getViewClass(MethodParameter parameter, Environment env) {
-        Class<?> viewClass = getView(parameter.getExecutable().getParameterTypes()[0].getSimpleName(),
-                env.getProperty("microdeaf.mapper.mapstruct.view.path"));
-
-        if (viewClass != null) {
-            return viewClass;
-        }
-
-        return null;
-    }
-
-    public String getMapperPath(Object o, Environment env) {
-        if (o.getClass().getSimpleName().equals("ArrayList")) {
-            List list = (List) o;
-            String name = list.get(0).getClass().getSimpleName().contains("View") ?
-                    list.get(0).getClass().getSimpleName().split("View")[0] : list.get(0).getClass().getSimpleName();
-            return env.getProperty("microdeaf.mapper.mapstruct.path") + "." + name;
-
-        } else {
-            String name = o.getClass().getSimpleName().contains("View") ?
-                    o.getClass().getSimpleName().split("View")[0] : o.getClass().getSimpleName();
-            return env.getProperty("microdeaf.mapper.mapstruct.path") + "." + name;
-        }
-    }
-
-    private Class<?> getView(String modelName, String path) {
-        try {
-            return Class.forName(path + ".dto." + modelName + "View");
-        } catch (ClassNotFoundException e) {
-            try {
-                return Class.forName(path + ".entity." + modelName + "View");
-            } catch (ClassNotFoundException ex) {
-                try {
-                    return Class.forName(path + "." + modelName + "View");
-                } catch (ClassNotFoundException classNotFoundException) {
-                    return null;
+    /**
+     * @param source is an object that wanted map to target object
+     * @param type is enum class that specify the type of target object
+     * @return target of source class.
+     */
+    public Object target(Class source, ClassType type) {
+        for (Class<?> clazz : classes) {
+            MicrodeafMapper annotation = clazz.getAnnotation(MicrodeafMapper.class);
+            if (annotation != null) {
+                if (type == ClassType.VIEW && annotation.entity().getSimpleName().equals(source.getSimpleName())) {
+                    return annotation.view();
+                } else if (type == ClassType.ENTITY && annotation.view().getSimpleName().equals(source.getSimpleName())) {
+                    return annotation.entity();
                 }
             }
         }
+        return source;
     }
+
+    /**
+     * @param source is an object that specify the mapper class
+     * @return mapper of source class.
+     */
+    public Class<? extends BaseMapper> mapper(Class source) {
+        for (Class<?> clazz : classes) {
+            MicrodeafMapper annotation = clazz.getAnnotation(MicrodeafMapper.class);
+            if (annotation != null) {
+                if (annotation.entity().getSimpleName().equals(source.getSimpleName()) ||
+                        annotation.view().getSimpleName().equals(source.getSimpleName())) {
+                    return (Class<? extends BaseMapper>) clazz;
+                }
+            }
+        }
+        return null;
+    }
+
 }

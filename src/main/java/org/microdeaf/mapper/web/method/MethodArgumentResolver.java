@@ -1,10 +1,26 @@
+/*
+ * Copyright 2013-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.microdeaf.mapper.web.method;
 
 import org.mapstruct.factory.Mappers;
+import org.microdeaf.mapper.enums.ClassType;
 import org.microdeaf.mapper.mapstruct.ApplicationMapper;
+import org.microdeaf.mapper.mapstruct.BaseMapper;
 import org.microdeaf.mapper.web.processor.BodyMethodProcessor;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -15,7 +31,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.List;
 
 /**
- * Created by m.khosrojerdi
+ * This class handle the all of input objects
+ * that sent to the spring controller and
+ * convert all of input objects to entity models
+ * with central mapper called {@link ApplicationMapper}
+ *
+ * @author Mohammad Khosrojerdi     m.khosrojerdi.d@gmail.com
+ * @since 2020-07-06
  */
 public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -23,14 +45,11 @@ public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
     private BodyMethodProcessor bodyMethodProcessor = null;
     private ApplicationMapper mapper = Mappers.getMapper(ApplicationMapper.class);
-    private Environment env;
 
     public MethodArgumentResolver(HandlerMethodArgumentResolver handlerMethodArgumentResolver,
-                                  RequestMappingHandlerAdapter requestMappingHandlerAdapter,
-                                  Environment env) {
+                                  RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
         this.handlerMethodArgumentResolver = handlerMethodArgumentResolver;
-        this.env = env;
     }
 
     @Override
@@ -40,10 +59,10 @@ public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        Class<?> viewClass = RequestResponseMethod.getInstance().getViewClass(parameter, env);
+        Object viewClass = RequestResponseMethod.getInstance().target(parameter.getExecutable().getParameterTypes()[0], ClassType.VIEW);
         if (viewClass != null) {
             return returnModel(getBodyMethodProcessor()
-                    .resolveArgument(parameter, mavContainer, webRequest, binderFactory, viewClass));
+                    .resolveArgument(parameter, mavContainer, webRequest, binderFactory, viewClass.getClass()));
         } else {
             return getBodyMethodProcessor().resolveArgument(parameter, mavContainer, webRequest,
                     binderFactory);
@@ -59,7 +78,8 @@ public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     private Object returnModel(Object o) {
-        return mapper.toEntity(o, RequestResponseMethod.getInstance().getMapperPath(o, env));
+        Class<? extends BaseMapper> mapperClass = RequestResponseMethod.getInstance().mapper(o.getClass());
+        return mapperClass != null ? mapper.toEntity(o, mapperClass) : o;
     }
 
 }

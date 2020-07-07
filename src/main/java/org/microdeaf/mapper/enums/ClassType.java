@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.microdeaf.mapper.mapstruct;
+package org.microdeaf.mapper.enums;
+
+import org.microdeaf.mapper.annotation.MicrodeafMapper;
 
 /**
- * This interface is base of all mappers.
- * All interface mappers must extends this interface
+ * This enum specified type of target class
+ * that defined in {@link MicrodeafMapper}
  *
  * @author Mohammad Khosrojerdi     m.khosrojerdi.d@gmail.com
  * @since 2020-07-06
  */
-public interface BaseMapper<T, V> {
+public enum ClassType {
 
-    V toView(T entity);
+    /**
+     * Entity declaration
+     */
+    ENTITY,
 
-    T toEntity(V view);
+    /**
+     * View declaration
+     */
+    VIEW;
 
 }
