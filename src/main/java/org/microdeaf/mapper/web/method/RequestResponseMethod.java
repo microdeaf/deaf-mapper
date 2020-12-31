@@ -73,7 +73,7 @@ public class RequestResponseMethod {
      * @param type is enum class that specify the type of target object
      * @return target of source class.
      */
-    public Object target(Class source, ClassType type) {
+    public Class target(Class source, ClassType type) {
         for (Class<?> clazz : classes) {
             MicrodeafMapper annotation = clazz.getAnnotation(MicrodeafMapper.class);
             if (annotation != null) {

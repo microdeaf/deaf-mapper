@@ -59,10 +59,10 @@ public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        Object viewClass = RequestResponseMethod.getInstance().target(parameter.getExecutable().getParameterTypes()[0], ClassType.VIEW);
+        Class viewClass = RequestResponseMethod.getInstance().target(parameter.getExecutable().getParameterTypes()[0], ClassType.VIEW);
         if (viewClass != null) {
             return returnModel(getBodyMethodProcessor()
-                    .resolveArgument(parameter, mavContainer, webRequest, binderFactory, viewClass.getClass()));
+                    .resolveArgument(parameter, mavContainer, webRequest, binderFactory, viewClass));
         } else {
             return getBodyMethodProcessor().resolveArgument(parameter, mavContainer, webRequest,
                     binderFactory);
@@ -80,6 +80,13 @@ public class MethodArgumentResolver implements HandlerMethodArgumentResolver {
     private Object returnModel(Object o) {
         Class<? extends BaseMapper> mapperClass = RequestResponseMethod.getInstance().mapper(o.getClass());
         return mapperClass != null ? mapper.toEntity(o, mapperClass) : o;
+    }
+
+    public static void main(String[] args) {
+        Object obj = RequestResponseMethod.class;
+        System.out.println(obj.getClass().getName());
+        System.out.println(obj);
+        System.out.println(RequestResponseMethod.class);
     }
 
 }
