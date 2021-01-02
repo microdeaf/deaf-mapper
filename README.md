@@ -1,4 +1,4 @@
-# Deaf Mapper 1.0.0
+# Deaf Mapper 2.0.0
 
 Deaf Mapper is a framework that integrate mapper frameworks with spring boot projects. 
 This version use [mapstruct](https://mapstruct.org/) for mapping entity models to dto objects
