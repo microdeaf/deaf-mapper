@@ -7,6 +7,29 @@
     <version>2.0.1</version>
     <name>deaf-mapper</name>
     <description>Integrate mapper frameworks with spring projects</description>
+    <url>https://github.com/microdeaf/deaf-mapper</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Mohammad Khosrojerdi</name>
+            <email>khosrojerdi.mohammad@gmail.com</email>
+            <organization>Microdeaf</organization>
+            <organizationUrl>https://github.com/microdeaf</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/microdeaf/deaf-mapper.git</connection>
+        <developerConnection>scm:git:ssh://github.com:microdeaf/deaf-mapper.git</developerConnection>
+        <url>https://github.com/microdeaf/deaf-mapper</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -70,6 +93,19 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>https://nexus.ebazarcenter.ir/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>https://nexus.ebazarcenter.ir/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
