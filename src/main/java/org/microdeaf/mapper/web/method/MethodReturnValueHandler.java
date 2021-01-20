@@ -51,8 +51,10 @@ public class MethodReturnValueHandler implements HandlerMethodReturnValueHandler
         Class<? extends BaseMapper> mapperClass;
         if (o instanceof List) {
             List list = (List) o;
-            mapperClass = RequestResponseMethod.getInstance().mapper(list.get(0).getClass());
-            o = mapperClass != null ? mapper.toViews(list, mapperClass) : list;
+            if (list.size() != 0) {
+                mapperClass = RequestResponseMethod.getInstance().mapper(list.get(0).getClass());
+                o = mapperClass != null ? mapper.toViews(list, mapperClass) : list;
+            }
         } else {
             mapperClass = RequestResponseMethod.getInstance().mapper(o.getClass());
             o = mapperClass != null ? mapper.toView(o, mapperClass) : o;

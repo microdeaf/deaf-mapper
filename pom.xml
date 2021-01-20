@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.microdeaf</groupId>
     <artifactId>deaf-mapper</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <name>deaf-mapper</name>
     <description>Integrate mapper frameworks with spring projects</description>
 
