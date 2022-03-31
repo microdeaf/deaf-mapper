@@ -34,7 +34,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <org.springframework>5.2.7.RELEASE</org.springframework>
+        <org.springframework>5.3.18</org.springframework>
         <org.springframework.hateoas>1.0.4.RELEASE</org.springframework.hateoas>
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.2</org.projectlombok.version>
